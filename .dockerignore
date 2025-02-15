@@ -1,0 +1,7 @@
+.git
+tmp
+Dockerfile
+compose.yaml
+.gitignore
+.env
+.idea
