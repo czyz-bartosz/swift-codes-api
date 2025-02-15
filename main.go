@@ -1,21 +1,22 @@
 package main
 
 import (
-	"fmt"
-	"github.com/gin-gonic/gin"
-	"net/http"
+	"awesomeProject/configs"
+	"awesomeProject/dbs"
+	"awesomeProject/routes"
 )
 
 func main() {
-	r := gin.Default()
-	r.GET("/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Hello World!!",
-		})
-	})
-	err := r.Run(":8080")
+	config := configs.GetConfig()
+
+	_ = dbs.Connect(
+		config.DBConfig,
+	)
+
+	router := routes.SetupRouter()
+	err := router.Run(":8080")
+
 	if err != nil {
-		return
+		panic(err)
 	}
-	fmt.Println("listening on port 8080")
 }
