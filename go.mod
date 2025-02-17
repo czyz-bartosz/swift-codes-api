@@ -4,7 +4,6 @@ go 1.24
 
 require (
 	github.com/gin-gonic/gin v1.10.0
-	github.com/joho/godotenv v1.5.1
 	github.com/uptrace/bun v1.2.9
 	github.com/uptrace/bun/dialect/pgdialect v1.2.9
 	github.com/uptrace/bun/driver/pgdriver v1.2.9
