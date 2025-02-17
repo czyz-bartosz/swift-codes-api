@@ -12,7 +12,7 @@ func main() {
 	config := configs.GetConfig()
 
 	db := dbs.Connect(
-		config.DBConfig,
+		&config.DBConfig,
 	)
 
 	defer func(db *bun.DB) {

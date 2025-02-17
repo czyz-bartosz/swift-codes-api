@@ -20,7 +20,7 @@ type Config struct {
 	SSLMode  string
 }
 
-func Connect(cfg Config) *bun.DB {
+func Connect(cfg *Config) *bun.DB {
 	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s",
 		cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.Database, cfg.SSLMode)
 
