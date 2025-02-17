@@ -1,21 +1,36 @@
 package main
 
 import (
-	"fmt"
-	"github.com/gin-gonic/gin"
-	"net/http"
+	"awesomeProject/configs"
+	"awesomeProject/dbs"
+	"awesomeProject/migrations"
+	"awesomeProject/routes"
+	"github.com/uptrace/bun"
 )
 
 func main() {
-	r := gin.Default()
-	r.GET("/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Hello World!!",
-		})
-	})
-	err := r.Run(":8080")
+	config := configs.GetConfig()
+
+	db := dbs.Connect(
+		&config.DBConfig,
+	)
+
+	defer func(db *bun.DB) {
+		err := db.Close()
+		if err != nil {
+			panic(err)
+		}
+	}(db)
+
+	err := migrations.Migrate(db)
 	if err != nil {
-		return
+		panic(err)
 	}
-	fmt.Println("listening on port 8080")
+
+	router := routes.SetupRouter()
+	err = router.Run(":8080")
+
+	if err != nil {
+		panic(err)
+	}
 }
