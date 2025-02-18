@@ -22,11 +22,7 @@ func GetFilePath() string {
 	return os.Args[1]
 }
 
-func isSwiftCodeOfHeadquarter(swiftCode string) bool {
-	return strings.HasSuffix(swiftCode, "XXX")
-}
-
-func parseCSVFile(csvFilePath string) ([]models.Bank, error) {
+func parseCSVFile(csvFilePath string) ([]models.Swift, error) {
 	file, err := os.Open(csvFilePath)
 	if err != nil {
 		return nil, fmt.Errorf("could not open file %s: %v", csvFilePath, err)
@@ -47,32 +43,32 @@ func parseCSVFile(csvFilePath string) ([]models.Bank, error) {
 		return nil, err
 	}
 
-	var banks []models.Bank
+	var swifts []models.Swift
 
 	for record, err := reader.Read(); err == nil; record, err = reader.Read() {
 		if len(record) < 8 {
 			continue
 		}
 
-		bank := models.Bank{
+		swift := models.Swift{
 			CountryIso2: strings.ToUpper(record[0]),
 			SwiftCode:   strings.ToUpper(record[1]),
-			Name:        record[3],
+			BankName:    record[3],
 			Address:     record[4],
 			TownName:    record[5],
 			CountryName: strings.ToUpper(record[6]),
 		}
 
-		if len(bank.SwiftCode) != 11 {
+		if len(swift.SwiftCode) != 11 {
 			continue
 		}
 
-		bank.IsHeadquarter = isSwiftCodeOfHeadquarter(bank.SwiftCode)
+		swift.IsHeadquarter = models.IsSwiftCodeOfHeadquarter(swift.SwiftCode)
 
-		banks = append(banks, bank)
+		swifts = append(swifts, swift)
 	}
 
-	return banks, nil
+	return swifts, nil
 }
 
 func ImportData(csvFilePath string) error {

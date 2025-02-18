@@ -4,19 +4,14 @@ import (
 	"awesomeProject/controllers"
 	"awesomeProject/repositories"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
-func SetupGroup(group *gin.RouterGroup, bankRepo repositories.BankRepo) {
+func SetupGroup(group *gin.RouterGroup, swiftRepo repositories.SwiftRepo) {
 	controller := controllers.Controller{
-		BankRepo: bankRepo,
+		SwiftRepo: swiftRepo,
 	}
 
-	group.GET("/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Hello World v1",
-		})
-	})
-
-	group.GET("/:swiftCode", controller.GetDetails)
+	group.GET("/:swiftCode", controller.GetSwiftDetails)
+	group.GET("/country/:countryIso2Code", controller.GetSwiftsDetailsByCountryIso2Code)
+	group.POST("/", controller.AddSwift)
 }
