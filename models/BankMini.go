@@ -1,6 +1,6 @@
 package models
 
-type BankBranch struct {
+type BankMini struct {
 	CountryIso2   string `bun:"country_iso2_code" json:"countryISO2"`
 	SwiftCode     string `bun:"swift_code," json:"swiftCode"`
 	Name          string `bun:"name" json:"bankName"`

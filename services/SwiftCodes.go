@@ -11,7 +11,7 @@ import (
 
 func GetBankDetails(ctx context.Context, swiftCode string, bankRepo repositories.BankRepo) (
 	bank *models.Bank,
-	branches []models.BankBranch,
+	branches []models.BankMini,
 	err error,
 ) {
 	bank, err = bankRepo.GetBySwiftCode(ctx, swiftCode)
@@ -22,10 +22,35 @@ func GetBankDetails(ctx context.Context, swiftCode string, bankRepo repositories
 		}
 		return
 	}
+	if !models.IsSwiftCodeOfHeadquarter(swiftCode) {
+		return bank, nil, nil
+	}
+
 	branches, err = bankRepo.GetBranchesBySwiftCode(ctx, swiftCode)
 	if err != nil {
 		return
 	}
 
 	return bank, branches, nil
+}
+
+func GetBanksDetailsByCountryIso2Code(ctx context.Context, countryIso2Code string, bankRepo repositories.BankRepo) (
+	countryName *string,
+	banks []models.BankMini,
+	err error,
+) {
+	banks, err = bankRepo.GetByCountryIso2Code(ctx, countryIso2Code)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			err = customErrors.ErrBankNotFound
+		}
+		return
+	}
+
+	countryName, err = bankRepo.GetCountryNameByIso2Code(ctx, countryIso2Code)
+	if err != nil {
+		return
+	}
+
+	return
 }

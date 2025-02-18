@@ -3,6 +3,7 @@ package repositories
 import (
 	"awesomeProject/models"
 	"context"
+	"database/sql"
 	"fmt"
 	"github.com/uptrace/bun"
 )
@@ -17,12 +18,12 @@ func (bankRepo BankRepoPostgres) GetBySwiftCode(ctx context.Context, swiftCode s
 	return bank, err
 }
 
-func (bankRepo BankRepoPostgres) GetBranchesBySwiftCode(ctx context.Context, swiftCode string) ([]models.BankBranch, error) {
+func (bankRepo BankRepoPostgres) GetBranchesBySwiftCode(ctx context.Context, swiftCode string) ([]models.BankMini, error) {
 	if len(swiftCode) != 11 {
 		return nil, fmt.Errorf("swiftCode must be 11 characters")
 	}
 
-	branches := make([]models.BankBranch, 0)
+	branches := make([]models.BankMini, 0)
 	query := `
         SELECT address, name, country_iso2_code, is_headquarter, swift_code 
         FROM banks 
@@ -30,5 +31,39 @@ func (bankRepo BankRepoPostgres) GetBranchesBySwiftCode(ctx context.Context, swi
     `
 
 	err := bankRepo.Db.NewRaw(query, swiftCode[:8], swiftCode).Scan(ctx, &branches)
+	if len(branches) == 0 {
+		return nil, sql.ErrNoRows
+	}
 	return branches, err
+}
+
+func (bankRepo BankRepoPostgres) GetByCountryIso2Code(ctx context.Context, countryIso2Code string) ([]models.BankMini, error) {
+	branches := make([]models.BankMini, 0)
+	query := `
+        SELECT address, name, country_iso2_code, is_headquarter, swift_code 
+        FROM banks 
+        WHERE banks.country_iso2_code = ?
+    `
+
+	err := bankRepo.Db.NewRaw(query, countryIso2Code).Scan(ctx, &branches)
+	if len(branches) == 0 {
+		return nil, sql.ErrNoRows
+	}
+	return branches, err
+}
+
+func (bankRepo BankRepoPostgres) GetCountryNameByIso2Code(ctx context.Context, countryIso2Code string) (*string, error) {
+	countryName := ""
+
+	query := `
+        SELECT banks.country_name
+        FROM banks 
+        WHERE banks.country_iso2_code = ?
+        LIMIT 1
+    `
+
+	err := bankRepo.Db.NewRaw(query, countryIso2Code).Scan(ctx, &countryName)
+	fmt.Println(countryIso2Code, countryName)
+
+	return &countryName, err
 }

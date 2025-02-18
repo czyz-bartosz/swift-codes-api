@@ -22,10 +22,6 @@ func GetFilePath() string {
 	return os.Args[1]
 }
 
-func isSwiftCodeOfHeadquarter(swiftCode string) bool {
-	return strings.HasSuffix(swiftCode, "XXX")
-}
-
 func parseCSVFile(csvFilePath string) ([]models.Bank, error) {
 	file, err := os.Open(csvFilePath)
 	if err != nil {
@@ -67,7 +63,7 @@ func parseCSVFile(csvFilePath string) ([]models.Bank, error) {
 			continue
 		}
 
-		bank.IsHeadquarter = isSwiftCodeOfHeadquarter(bank.SwiftCode)
+		bank.IsHeadquarter = models.IsSwiftCodeOfHeadquarter(bank.SwiftCode)
 
 		banks = append(banks, bank)
 	}

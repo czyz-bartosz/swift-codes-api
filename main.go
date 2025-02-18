@@ -3,8 +3,8 @@ package main
 import (
 	"awesomeProject/configs"
 	"awesomeProject/dbs"
+	"awesomeProject/dbs/migrations"
 	"awesomeProject/internal/dbimporter/utils"
-	"awesomeProject/migrations"
 	"awesomeProject/repositories"
 	"awesomeProject/routes"
 	"fmt"

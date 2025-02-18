@@ -24,3 +24,7 @@ func (b *Bank) BeforeAppendModel(ctx context.Context, query bun.Query) error {
 	b.CountryName = strings.ToUpper(b.CountryName)
 	return nil
 }
+
+func IsSwiftCodeOfHeadquarter(swiftCode string) bool {
+	return strings.HasSuffix(swiftCode, "XXX")
+}
