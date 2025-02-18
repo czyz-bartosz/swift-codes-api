@@ -12,22 +12,22 @@ import (
 )
 
 type Controller struct {
-	BankRepo repositories.BankRepo
+	SwiftRepo repositories.SwiftRepo
 }
 
 func handleError(c *gin.Context, err error) {
-	var bankErr *customErrors.HttpError
-	if errors.As(err, &bankErr) {
-		bankErr.Send(c)
+	var httpErr *customErrors.HttpError
+	if errors.As(err, &httpErr) {
+		httpErr.Send(c)
 		return
 	}
 	customErrors.ErrUnknown.Send(c)
 }
 
-func (controller Controller) GetBankDetails(c *gin.Context) {
+func (controller Controller) GetSwiftDetails(c *gin.Context) {
 	ctx := c.Request.Context()
 	swiftCode := c.Param("swiftCode")
-	bank, branches, err := services.GetBankDetails(ctx, swiftCode, controller.BankRepo)
+	swift, branches, err := services.GetSwiftDetails(ctx, swiftCode, controller.SwiftRepo)
 	if err != nil {
 		handleError(c, err)
 		return
@@ -35,31 +35,31 @@ func (controller Controller) GetBankDetails(c *gin.Context) {
 
 	if models.IsSwiftCodeOfHeadquarter(swiftCode) {
 		c.JSON(http.StatusOK, gin.H{
-			"address":       bank.Address,
-			"bankName":      bank.Name,
-			"countryISO2":   bank.CountryIso2,
-			"countryName":   bank.CountryName,
-			"isHeadquarter": bank.IsHeadquarter,
-			"swiftCode":     bank.SwiftCode,
+			"address":       swift.Address,
+			"bankName":      swift.BankName,
+			"countryISO2":   swift.CountryIso2,
+			"countryName":   swift.CountryName,
+			"isHeadquarter": swift.IsHeadquarter,
+			"swiftCode":     swift.SwiftCode,
 			"branches":      branches,
 		})
 	} else {
 		c.JSON(http.StatusOK, gin.H{
-			"address":       bank.Address,
-			"bankName":      bank.Name,
-			"countryISO2":   bank.CountryIso2,
-			"countryName":   bank.CountryName,
-			"isHeadquarter": bank.IsHeadquarter,
-			"swiftCode":     bank.SwiftCode,
+			"address":       swift.Address,
+			"bankName":      swift.BankName,
+			"countryISO2":   swift.CountryIso2,
+			"countryName":   swift.CountryName,
+			"isHeadquarter": swift.IsHeadquarter,
+			"swiftCode":     swift.SwiftCode,
 		})
 	}
 }
 
-func (controller Controller) GetBanksDetailsByCountryIso2Code(c *gin.Context) {
+func (controller Controller) GetSwiftsDetailsByCountryIso2Code(c *gin.Context) {
 	ctx := c.Request.Context()
 	countryIso2Code := c.Param("countryIso2Code")
 
-	countryName, banks, err := services.GetBanksDetailsByCountryIso2Code(ctx, countryIso2Code, controller.BankRepo)
+	countryName, swifts, err := services.GetSwiftsDetailsByCountryIso2Code(ctx, countryIso2Code, controller.SwiftRepo)
 	if err != nil {
 		handleError(c, err)
 		return
@@ -67,14 +67,14 @@ func (controller Controller) GetBanksDetailsByCountryIso2Code(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"countryISO2": countryIso2Code,
 		"countryName": countryName,
-		"swiftCodes":  banks,
+		"swiftCodes":  swifts,
 	})
 }
 
-func (controller Controller) AddBank(c *gin.Context) {
+func (controller Controller) AddSwift(c *gin.Context) {
 	ctx := c.Request.Context()
-	var bank models.Bank
-	err := c.ShouldBindJSON(&bank)
+	var swift models.Swift
+	err := c.ShouldBindJSON(&swift)
 
 	if err != nil {
 		var typeError *json.UnmarshalTypeError
@@ -88,7 +88,7 @@ func (controller Controller) AddBank(c *gin.Context) {
 		return
 	}
 
-	err = services.AddBank(ctx, &bank, controller.BankRepo)
+	err = services.AddSwift(ctx, &swift, controller.SwiftRepo)
 	if err != nil {
 		handleError(c, err)
 		return

@@ -35,11 +35,11 @@ func main() {
 		fmt.Println(err)
 	}
 
-	bankRepo := &repositories.BankRepoPostgres{
+	swiftRepo := &repositories.SwiftRepoPostgres{
 		Db: db,
 	}
 
-	router := routes.SetupRouter(bankRepo)
+	router := routes.SetupRouter(swiftRepo)
 	err = router.Run(":8080")
 
 	if err != nil {

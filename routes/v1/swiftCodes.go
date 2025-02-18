@@ -6,12 +6,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetupGroup(group *gin.RouterGroup, bankRepo repositories.BankRepo) {
+func SetupGroup(group *gin.RouterGroup, swiftRepo repositories.SwiftRepo) {
 	controller := controllers.Controller{
-		BankRepo: bankRepo,
+		SwiftRepo: swiftRepo,
 	}
 
-	group.GET("/:swiftCode", controller.GetBankDetails)
-	group.GET("/country/:countryIso2Code", controller.GetBanksDetailsByCountryIso2Code)
-	group.POST("/", controller.AddBank)
+	group.GET("/:swiftCode", controller.GetSwiftDetails)
+	group.GET("/country/:countryIso2Code", controller.GetSwiftsDetailsByCountryIso2Code)
+	group.POST("/", controller.AddSwift)
 }

@@ -29,7 +29,7 @@ func NewHttpError(code int, message string) *HttpError {
 	}
 }
 
-var ErrBankNotFound = NewHttpError(http.StatusNotFound, "Bank not found")
+var ErrBankNotFound = NewHttpError(http.StatusNotFound, "Swift not found")
 var ErrUnknown = NewHttpError(http.StatusInternalServerError, "Something went wrong")
 var ErrBadRequest = NewHttpError(http.StatusBadRequest, "Bad request")
 var ErrSwiftCodeAlreadyExists = NewHttpError(http.StatusConflict, "Swift code already exists")

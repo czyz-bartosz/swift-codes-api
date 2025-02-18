@@ -9,12 +9,12 @@ import (
 	"errors"
 )
 
-func GetBankDetails(ctx context.Context, swiftCode string, bankRepo repositories.BankRepo) (
-	bank *models.Bank,
-	branches []models.BankMini,
+func GetSwiftDetails(ctx context.Context, swiftCode string, bankRepo repositories.SwiftRepo) (
+	swift *models.Swift,
+	branches []models.SwiftMini,
 	err error,
 ) {
-	bank, err = bankRepo.GetBySwiftCode(ctx, swiftCode)
+	swift, err = bankRepo.GetBySwiftCode(ctx, swiftCode)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			err = customErrors.ErrBankNotFound
@@ -23,7 +23,7 @@ func GetBankDetails(ctx context.Context, swiftCode string, bankRepo repositories
 		return
 	}
 	if !models.IsSwiftCodeOfHeadquarter(swiftCode) {
-		return bank, nil, nil
+		return swift, nil, nil
 	}
 
 	branches, err = bankRepo.GetBranchesBySwiftCode(ctx, swiftCode)
@@ -31,15 +31,15 @@ func GetBankDetails(ctx context.Context, swiftCode string, bankRepo repositories
 		return
 	}
 
-	return bank, branches, nil
+	return swift, branches, nil
 }
 
-func GetBanksDetailsByCountryIso2Code(ctx context.Context, countryIso2Code string, bankRepo repositories.BankRepo) (
+func GetSwiftsDetailsByCountryIso2Code(ctx context.Context, countryIso2Code string, bankRepo repositories.SwiftRepo) (
 	countryName *string,
-	banks []models.BankMini,
+	swifts []models.SwiftMini,
 	err error,
 ) {
-	banks, err = bankRepo.GetByCountryIso2Code(ctx, countryIso2Code)
+	swifts, err = bankRepo.GetByCountryIso2Code(ctx, countryIso2Code)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			err = customErrors.ErrBankNotFound
@@ -55,8 +55,8 @@ func GetBanksDetailsByCountryIso2Code(ctx context.Context, countryIso2Code strin
 	return
 }
 
-func AddBank(ctx context.Context, bank *models.Bank, bankRepo repositories.BankRepo) error {
-	_, err := bankRepo.GetBySwiftCode(ctx, bank.SwiftCode)
+func AddSwift(ctx context.Context, swift *models.Swift, bankRepo repositories.SwiftRepo) error {
+	_, err := bankRepo.GetBySwiftCode(ctx, swift.SwiftCode)
 
 	if err == nil {
 		return customErrors.ErrSwiftCodeAlreadyExists
@@ -66,7 +66,7 @@ func AddBank(ctx context.Context, bank *models.Bank, bankRepo repositories.BankR
 		return err
 	}
 
-	err = bankRepo.AddBank(ctx, bank)
+	err = bankRepo.AddSwift(ctx, swift)
 	if err != nil {
 		return err
 	}
