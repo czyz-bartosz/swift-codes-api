@@ -98,3 +98,14 @@ func (controller Controller) AddSwift(c *gin.Context) {
 		"message": "Swift code added successfully",
 	})
 }
+
+func (controller Controller) DeleteSwift(c *gin.Context) {
+	ctx := c.Request.Context()
+	swiftCode := c.Param("swiftCode")
+	err := services.DeleteSwift(ctx, swiftCode, controller.SwiftRepo)
+	if err != nil {
+		handleError(c, err)
+		return
+	}
+	c.Status(http.StatusNoContent)
+}

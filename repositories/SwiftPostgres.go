@@ -73,3 +73,9 @@ func (swiftRepo SwiftRepoPostgres) AddSwift(ctx context.Context, swift *models.S
 
 	return err
 }
+
+func (swiftRepo SwiftRepoPostgres) DeleteSwift(ctx context.Context, swiftCode string) error {
+	_, err := swiftRepo.Db.NewDelete().Model(&models.Swift{}).Where("swift_code = ?", swiftCode).Exec(ctx)
+
+	return err
+}

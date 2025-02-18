@@ -17,7 +17,7 @@ func GetSwiftDetails(ctx context.Context, swiftCode string, bankRepo repositorie
 	swift, err = bankRepo.GetBySwiftCode(ctx, swiftCode)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			err = customErrors.ErrBankNotFound
+			err = customErrors.ErrSwiftNotFound
 			return
 		}
 		return
@@ -42,7 +42,7 @@ func GetSwiftsDetailsByCountryIso2Code(ctx context.Context, countryIso2Code stri
 	swifts, err = bankRepo.GetByCountryIso2Code(ctx, countryIso2Code)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			err = customErrors.ErrBankNotFound
+			err = customErrors.ErrSwiftNotFound
 		}
 		return
 	}
@@ -72,4 +72,19 @@ func AddSwift(ctx context.Context, swift *models.Swift, bankRepo repositories.Sw
 	}
 
 	return nil
+}
+
+func DeleteSwift(ctx context.Context, swiftCode string, bankRepo repositories.SwiftRepo) error {
+	_, err := bankRepo.GetBySwiftCode(ctx, swiftCode)
+
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return customErrors.ErrSwiftNotFound
+		}
+		return err
+	}
+
+	err = bankRepo.DeleteSwift(ctx, swiftCode)
+
+	return err
 }

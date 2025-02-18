@@ -11,7 +11,8 @@ func SetupGroup(group *gin.RouterGroup, swiftRepo repositories.SwiftRepo) {
 		SwiftRepo: swiftRepo,
 	}
 
-	group.GET("/:swiftCode", controller.GetSwiftDetails)
-	group.GET("/country/:countryIso2Code", controller.GetSwiftsDetailsByCountryIso2Code)
 	group.POST("/", controller.AddSwift)
+	group.GET("/:swiftCode", controller.GetSwiftDetails)
+	group.DELETE("/:swiftCode", controller.DeleteSwift)
+	group.GET("/country/:countryIso2Code", controller.GetSwiftsDetailsByCountryIso2Code)
 }
