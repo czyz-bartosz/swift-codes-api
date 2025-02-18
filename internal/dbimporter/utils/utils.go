@@ -1,17 +1,22 @@
 package utils
 
 import (
+	"awesomeProject/configs"
+	"awesomeProject/dbs"
 	"awesomeProject/models"
+	"context"
 	"encoding/csv"
 	"fmt"
+	"github.com/uptrace/bun"
+	"log"
 	"os"
 	"strings"
 )
 
 func GetFilePath() string {
 	if len(os.Args) < 2 {
-		fmt.Println("Usage: go run import_csv.go <path_to_csv>")
-		os.Exit(1)
+		log.Fatal("Usage: go run import_csv.go <path_to_csv>")
+		return ""
 	}
 
 	return os.Args[1]
@@ -21,36 +26,35 @@ func isSwiftCodeOfHeadquarter(swiftCode string) bool {
 	return strings.HasSuffix(swiftCode, "XXX")
 }
 
-func ParseCSVFile(csvFilePath string) *[]*models.Bank {
+func parseCSVFile(csvFilePath string) ([]models.Bank, error) {
 	file, err := os.Open(csvFilePath)
 	if err != nil {
-		panic(fmt.Sprintf("could not open file %s: %v", csvFilePath, err))
+		return nil, fmt.Errorf("could not open file %s: %v", csvFilePath, err)
 	}
 
 	defer func(file *os.File) {
 		err := file.Close()
 		if err != nil {
-			panic(err)
+			fmt.Println(err)
 		}
 	}(file)
 
-	// Read the CSV file
 	reader := csv.NewReader(file)
 
 	//skip header
 	_, err = reader.Read()
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	var banks []*models.Bank
+	var banks []models.Bank
 
 	for record, err := reader.Read(); err == nil; record, err = reader.Read() {
-		if len(record) != 8 {
-			panic(fmt.Sprintf("expected 8 fields, got %d", len(record)))
+		if len(record) < 8 {
+			continue
 		}
 
-		bank := &models.Bank{
+		bank := models.Bank{
 			CountryIso2: strings.ToUpper(record[0]),
 			SwiftCode:   strings.ToUpper(record[1]),
 			Name:        record[3],
@@ -68,5 +72,39 @@ func ParseCSVFile(csvFilePath string) *[]*models.Bank {
 		banks = append(banks, bank)
 	}
 
-	return &banks
+	return banks, nil
+}
+
+func ImportData(csvFilePath string) error {
+	config := configs.GetConfig()
+	db := dbs.Connect(
+		&config.DBConfig,
+	)
+
+	defer func(db *bun.DB) {
+		err := db.Close()
+		if err != nil {
+			fmt.Println("Error closing db")
+		}
+	}(db)
+
+	ctx := context.Background()
+
+	banks, err := parseCSVFile(csvFilePath)
+
+	if err != nil {
+		return err
+	}
+
+	err = db.RunInTx(ctx, nil, func(ctx context.Context, tx bun.Tx) error {
+		_, err := tx.NewInsert().Model(&banks).Exec(ctx)
+		return err
+	})
+
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("Import data successfully")
+	return nil
 }

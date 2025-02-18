@@ -3,8 +3,11 @@ package main
 import (
 	"awesomeProject/configs"
 	"awesomeProject/dbs"
+	"awesomeProject/internal/dbimporter/utils"
 	"awesomeProject/migrations"
+	"awesomeProject/repositories"
 	"awesomeProject/routes"
+	"fmt"
 	"github.com/uptrace/bun"
 )
 
@@ -27,7 +30,16 @@ func main() {
 		panic(err)
 	}
 
-	router := routes.SetupRouter()
+	err = utils.ImportData("./data.csv")
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	bankRepo := &repositories.BankRepoPostgres{
+		Db: db,
+	}
+
+	router := routes.SetupRouter(bankRepo)
 	err = router.Run(":8080")
 
 	if err != nil {

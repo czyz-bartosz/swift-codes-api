@@ -9,13 +9,13 @@ import (
 type Bank struct {
 	bun.BaseModel `bun:"table:banks,alias:b"`
 
-	CountryIso2   string `bun:"country_iso2_code,notnull" json:"country_iso2_code"`
-	SwiftCode     string `bun:"swift_code,pk," json:"swift_code"`
-	Name          string `bun:"name,notnull" json:"name"`
+	CountryIso2   string `bun:"country_iso2_code,notnull" json:"countryISO2"`
+	SwiftCode     string `bun:"swift_code,pk," json:"swiftCode"`
+	Name          string `bun:"name,notnull" json:"bankName"`
 	Address       string `bun:"address,notnull" json:"address"`
-	TownName      string `bun:"town_name,notnull" json:"town_name"`
-	CountryName   string `bun:"country_name,notnull" json:"country_name"`
-	IsHeadquarter bool   `bun:"is_headquarter,notnull" json:"is_headquarter"`
+	TownName      string `bun:"town_name,notnull" json:"townName"`
+	CountryName   string `bun:"country_name,notnull" json:"countryName"`
+	IsHeadquarter bool   `bun:"is_headquarter,notnull" json:"isHeadquarter"`
 }
 
 func (b *Bank) BeforeAppendModel(ctx context.Context, query bun.Query) error {
