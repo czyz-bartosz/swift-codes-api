@@ -54,3 +54,22 @@ func GetBanksDetailsByCountryIso2Code(ctx context.Context, countryIso2Code strin
 
 	return
 }
+
+func AddBank(ctx context.Context, bank *models.Bank, bankRepo repositories.BankRepo) error {
+	_, err := bankRepo.GetBySwiftCode(ctx, bank.SwiftCode)
+
+	if err == nil {
+		return customErrors.ErrSwiftCodeAlreadyExists
+	}
+
+	if !errors.Is(err, sql.ErrNoRows) {
+		return err
+	}
+
+	err = bankRepo.AddBank(ctx, bank)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

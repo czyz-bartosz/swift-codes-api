@@ -5,6 +5,7 @@ import (
 	"awesomeProject/models"
 	"awesomeProject/repositories"
 	"awesomeProject/services"
+	"encoding/json"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -67,5 +68,33 @@ func (controller Controller) GetBanksDetailsByCountryIso2Code(c *gin.Context) {
 		"countryISO2": countryIso2Code,
 		"countryName": countryName,
 		"swiftCodes":  banks,
+	})
+}
+
+func (controller Controller) AddBank(c *gin.Context) {
+	ctx := c.Request.Context()
+	var bank models.Bank
+	err := c.ShouldBindJSON(&bank)
+
+	if err != nil {
+		var typeError *json.UnmarshalTypeError
+		if errors.As(err, &typeError) {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": typeError.Field + " should be " + typeError.Type.Name(),
+			})
+			return
+		}
+		handleError(c, customErrors.ErrBadRequest)
+		return
+	}
+
+	err = services.AddBank(ctx, &bank, controller.BankRepo)
+	if err != nil {
+		handleError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{
+		"message": "Swift code added successfully",
 	})
 }

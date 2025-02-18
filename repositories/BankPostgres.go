@@ -67,3 +67,9 @@ func (bankRepo BankRepoPostgres) GetCountryNameByIso2Code(ctx context.Context, c
 
 	return &countryName, err
 }
+
+func (bankRepo BankRepoPostgres) AddBank(ctx context.Context, bank *models.Bank) error {
+	_, err := bankRepo.Db.NewInsert().Model(bank).Exec(ctx)
+
+	return err
+}

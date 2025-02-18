@@ -13,4 +13,5 @@ func SetupGroup(group *gin.RouterGroup, bankRepo repositories.BankRepo) {
 
 	group.GET("/:swiftCode", controller.GetBankDetails)
 	group.GET("/country/:countryIso2Code", controller.GetBanksDetailsByCountryIso2Code)
+	group.POST("/", controller.AddBank)
 }

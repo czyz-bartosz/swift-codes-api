@@ -10,4 +10,5 @@ type BankRepo interface {
 	GetBranchesBySwiftCode(context.Context, string) ([]models.BankMini, error)
 	GetByCountryIso2Code(context.Context, string) ([]models.BankMini, error)
 	GetCountryNameByIso2Code(context.Context, string) (*string, error)
+	AddBank(context.Context, *models.Bank) error
 }

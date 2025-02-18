@@ -13,7 +13,7 @@ type Bank struct {
 	SwiftCode     string `bun:"swift_code,pk," json:"swiftCode"`
 	Name          string `bun:"name,notnull" json:"bankName"`
 	Address       string `bun:"address,notnull" json:"address"`
-	TownName      string `bun:"town_name,notnull" json:"townName"`
+	TownName      string `bun:"town_name,notnull" json:"townName,omitempty"`
 	CountryName   string `bun:"country_name,notnull" json:"countryName"`
 	IsHeadquarter bool   `bun:"is_headquarter,notnull" json:"isHeadquarter"`
 }
