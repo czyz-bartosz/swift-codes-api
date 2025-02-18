@@ -7,6 +7,8 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"github.com/go-playground/validator/v10"
+	"strings"
 )
 
 func GetSwiftDetails(ctx context.Context, swiftCode string, bankRepo repositories.SwiftRepo) (
@@ -55,8 +57,13 @@ func GetSwiftsDetailsByCountryIso2Code(ctx context.Context, countryIso2Code stri
 	return
 }
 
-func AddSwift(ctx context.Context, swift *models.Swift, bankRepo repositories.SwiftRepo) error {
-	_, err := bankRepo.GetBySwiftCode(ctx, swift.SwiftCode)
+func AddSwift(ctx context.Context, swift *models.Swift, bankRepo repositories.SwiftRepo, validate *validator.Validate) error {
+	err := validate.Struct(swift)
+	if err != nil {
+		return err
+	}
+	swift.SwiftCode = strings.ToUpper(swift.SwiftCode)
+	_, err = bankRepo.GetBySwiftCode(ctx, swift.SwiftCode)
 
 	if err == nil {
 		return customErrors.ErrSwiftCodeAlreadyExists
@@ -75,6 +82,7 @@ func AddSwift(ctx context.Context, swift *models.Swift, bankRepo repositories.Sw
 }
 
 func DeleteSwift(ctx context.Context, swiftCode string, bankRepo repositories.SwiftRepo) error {
+	swiftCode = strings.ToUpper(swiftCode)
 	_, err := bankRepo.GetBySwiftCode(ctx, swiftCode)
 
 	if err != nil {

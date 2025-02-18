@@ -55,7 +55,6 @@ func parseCSVFile(csvFilePath string) ([]models.Swift, error) {
 			SwiftCode:   strings.ToUpper(record[1]),
 			BankName:    record[3],
 			Address:     record[4],
-			TownName:    record[5],
 			CountryName: strings.ToUpper(record[6]),
 		}
 

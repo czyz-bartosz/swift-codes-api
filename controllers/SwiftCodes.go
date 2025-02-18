@@ -7,18 +7,29 @@ import (
 	"awesomeProject/services"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"net/http"
+	"strings"
 )
 
 type Controller struct {
 	SwiftRepo repositories.SwiftRepo
+	Validate  *validator.Validate
 }
 
 func handleError(c *gin.Context, err error) {
 	var httpErr *customErrors.HttpError
 	if errors.As(err, &httpErr) {
 		httpErr.Send(c)
+		return
+	}
+	var validationErr validator.ValidationErrors
+	if errors.As(err, &validationErr) {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": strings.Split(validationErr.Error(), "\n"),
+		})
 		return
 	}
 	customErrors.ErrUnknown.Send(c)
@@ -88,9 +99,10 @@ func (controller Controller) AddSwift(c *gin.Context) {
 		return
 	}
 
-	err = services.AddSwift(ctx, &swift, controller.SwiftRepo)
+	err = services.AddSwift(ctx, &swift, controller.SwiftRepo, controller.Validate)
 	if err != nil {
 		handleError(c, err)
+		fmt.Print(err)
 		return
 	}
 

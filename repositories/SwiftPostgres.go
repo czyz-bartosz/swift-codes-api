@@ -31,9 +31,7 @@ func (swiftRepo SwiftRepoPostgres) GetBranchesBySwiftCode(ctx context.Context, s
     `
 
 	err := swiftRepo.Db.NewRaw(query, swiftCode[:8], swiftCode).Scan(ctx, &branches)
-	if len(branches) == 0 {
-		return nil, sql.ErrNoRows
-	}
+
 	return branches, err
 }
 

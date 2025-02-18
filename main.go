@@ -5,9 +5,11 @@ import (
 	"awesomeProject/dbs"
 	"awesomeProject/dbs/migrations"
 	"awesomeProject/internal/dbimporter/utils"
+	"awesomeProject/models"
 	"awesomeProject/repositories"
 	"awesomeProject/routes"
 	"fmt"
+	"github.com/go-playground/validator/v10"
 	"github.com/uptrace/bun"
 )
 
@@ -39,7 +41,10 @@ func main() {
 		Db: db,
 	}
 
-	router := routes.SetupRouter(swiftRepo)
+	validate := validator.New()
+	validate.RegisterStructValidation(models.SwiftStructLevelValidation, models.Swift{})
+
+	router := routes.SetupRouter(swiftRepo, validate)
 	err = router.Run(":8080")
 
 	if err != nil {
