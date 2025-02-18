@@ -31,9 +31,7 @@ func (swiftRepo SwiftRepoPostgres) GetBranchesBySwiftCode(ctx context.Context, s
     `
 
 	err := swiftRepo.Db.NewRaw(query, swiftCode[:8], swiftCode).Scan(ctx, &branches)
-	if len(branches) == 0 {
-		return nil, sql.ErrNoRows
-	}
+
 	return branches, err
 }
 
@@ -70,6 +68,12 @@ func (swiftRepo SwiftRepoPostgres) GetCountryNameByIso2Code(ctx context.Context,
 
 func (swiftRepo SwiftRepoPostgres) AddSwift(ctx context.Context, swift *models.Swift) error {
 	_, err := swiftRepo.Db.NewInsert().Model(swift).Exec(ctx)
+
+	return err
+}
+
+func (swiftRepo SwiftRepoPostgres) DeleteSwift(ctx context.Context, swiftCode string) error {
+	_, err := swiftRepo.Db.NewDelete().Model(&models.Swift{}).Where("swift_code = ?", swiftCode).Exec(ctx)
 
 	return err
 }
