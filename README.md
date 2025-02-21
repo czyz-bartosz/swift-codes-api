@@ -57,6 +57,10 @@ This is a Go-based REST API for managing SWIFT codes (Bank Identifier Codes). Th
 
 ## Running Tests
 
+> ⚠️ **Warning: Running Integration Tests Will Clear the Database**  
+> Please note that running the integration tests will clear the database.  
+> To restore the initial state, simply restart the application.
+
 To run the unit and integration tests on your local computer, execute the following command.:
 
 ```bash
