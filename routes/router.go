@@ -1,16 +1,15 @@
 package routes
 
 import (
-	"awesomeProject/repositories"
+	"awesomeProject/controllers"
 	"awesomeProject/routes/v1"
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 )
 
-func SetupRouter(swiftRepo repositories.SwiftRepo, validate *validator.Validate) *gin.Engine {
+func SetupRouter(swiftController *controllers.Controller) *gin.Engine {
 	router := gin.Default()
 
-	v1.SetupGroup(router.Group("/v1/swift-codes"), swiftRepo, validate)
+	v1.SetupGroup(router.Group("/v1/swift-codes"), swiftController)
 
 	err := router.Run(":8080")
 

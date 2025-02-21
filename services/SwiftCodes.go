@@ -10,11 +10,24 @@ import (
 	"strings"
 )
 
-type SwiftValidator interface {
-	Struct(s interface{}) error
+type SwiftService interface {
+	GetSwiftDetails(ctx context.Context, swiftCode string, swiftRepo repositories.SwiftRepo) (
+		swift *models.Swift,
+		branches []models.SwiftMini,
+		err error,
+	)
+	GetSwiftsDetailsByCountryIso2Code(ctx context.Context, countryIso2Code string, swiftRepo repositories.SwiftRepo) (
+		countryName string,
+		swifts []models.SwiftMini,
+		err error,
+	)
+	AddSwift(ctx context.Context, swift *models.Swift, swiftRepo repositories.SwiftRepo, validate models.SwiftValidator) error
+	DeleteSwift(ctx context.Context, swiftCode string, swiftRepo repositories.SwiftRepo) error
 }
 
-func GetSwiftDetails(ctx context.Context, swiftCode string, swiftRepo repositories.SwiftRepo) (
+type SwiftServiceDefault struct{}
+
+func (s *SwiftServiceDefault) GetSwiftDetails(ctx context.Context, swiftCode string, swiftRepo repositories.SwiftRepo) (
 	swift *models.Swift,
 	branches []models.SwiftMini,
 	err error,
@@ -39,7 +52,7 @@ func GetSwiftDetails(ctx context.Context, swiftCode string, swiftRepo repositori
 	return swift, branches, nil
 }
 
-func GetSwiftsDetailsByCountryIso2Code(ctx context.Context, countryIso2Code string, swiftRepo repositories.SwiftRepo) (
+func (s *SwiftServiceDefault) GetSwiftsDetailsByCountryIso2Code(ctx context.Context, countryIso2Code string, swiftRepo repositories.SwiftRepo) (
 	countryName string,
 	swifts []models.SwiftMini,
 	err error,
@@ -60,7 +73,7 @@ func GetSwiftsDetailsByCountryIso2Code(ctx context.Context, countryIso2Code stri
 	return
 }
 
-func AddSwift(ctx context.Context, swift *models.Swift, swiftRepo repositories.SwiftRepo, validate SwiftValidator) error {
+func (s *SwiftServiceDefault) AddSwift(ctx context.Context, swift *models.Swift, swiftRepo repositories.SwiftRepo, validate models.SwiftValidator) error {
 	err := validate.Struct(swift)
 	if err != nil {
 		return err
@@ -84,7 +97,7 @@ func AddSwift(ctx context.Context, swift *models.Swift, swiftRepo repositories.S
 	return nil
 }
 
-func DeleteSwift(ctx context.Context, swiftCode string, swiftRepo repositories.SwiftRepo) error {
+func (s *SwiftServiceDefault) DeleteSwift(ctx context.Context, swiftCode string, swiftRepo repositories.SwiftRepo) error {
 	swiftCode = strings.ToUpper(swiftCode)
 	_, err := swiftRepo.GetBySwiftCode(ctx, swiftCode)
 

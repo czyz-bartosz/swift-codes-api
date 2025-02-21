@@ -16,6 +16,7 @@ func TestGetSwiftDetails(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
+	service := &SwiftServiceDefault{}
 	mockSwiftRepo := mocks.NewMockSwiftRepo(ctrl)
 	ctx := context.Background()
 
@@ -142,7 +143,7 @@ func TestGetSwiftDetails(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.mockSetup()
-			gotSwift, gotBranches, err := GetSwiftDetails(ctx, tt.swiftCode, mockSwiftRepo)
+			gotSwift, gotBranches, err := service.GetSwiftDetails(ctx, tt.swiftCode, mockSwiftRepo)
 			if tt.wantErr != nil {
 				assert.Error(t, err)
 				assert.Equal(t, tt.wantErr, err)
@@ -159,6 +160,7 @@ func TestGetSwiftsDetailsByCountryIso2Code(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
+	service := &SwiftServiceDefault{}
 	mockSwiftRepo := mocks.NewMockSwiftRepo(ctrl)
 	ctx := context.Background()
 
@@ -233,7 +235,7 @@ func TestGetSwiftsDetailsByCountryIso2Code(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.mockSetup()
-			gotCountryName, gotSwifts, err := GetSwiftsDetailsByCountryIso2Code(ctx, tt.countryIso2Code, mockSwiftRepo)
+			gotCountryName, gotSwifts, err := service.GetSwiftsDetailsByCountryIso2Code(ctx, tt.countryIso2Code, mockSwiftRepo)
 			if tt.wantErr != nil {
 				assert.Error(t, err)
 				assert.Equal(t, tt.wantErr, err)
@@ -250,6 +252,7 @@ func TestAddSwift(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
+	service := &SwiftServiceDefault{}
 	mockSwiftRepo := mocks.NewMockSwiftRepo(ctrl)
 	mockValidator := mocks.NewMockSwiftValidator(ctrl)
 	ctx := context.Background()
@@ -364,7 +367,7 @@ func TestAddSwift(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.mockSetup()
-			err := AddSwift(ctx, tt.swift, mockSwiftRepo, mockValidator)
+			err := service.AddSwift(ctx, tt.swift, mockSwiftRepo, mockValidator)
 			if tt.wantErr != nil {
 				assert.Error(t, err)
 				assert.Equal(t, tt.wantErr, err)
@@ -379,6 +382,7 @@ func TestDeleteSwift(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
+	service := &SwiftServiceDefault{}
 	mockSwiftRepo := mocks.NewMockSwiftRepo(ctrl)
 	ctx := context.Background()
 
@@ -427,7 +431,7 @@ func TestDeleteSwift(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.mockSetup()
-			err := DeleteSwift(ctx, tt.swiftCode, mockSwiftRepo)
+			err := service.DeleteSwift(ctx, tt.swiftCode, mockSwiftRepo)
 			if tt.wantErr != nil {
 				assert.Error(t, err)
 				assert.Equal(t, tt.wantErr, err)
