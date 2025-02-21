@@ -12,6 +12,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/go-playground/validator/v10"
 	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
@@ -24,12 +25,12 @@ import (
 func setupTestEnvironment(t *testing.T) (*bun.DB, *controllers.Controller) {
 	err := godotenv.Load("../.env")
 
-	if err != nil {
-		t.Fatalf("Env file error: %v", err)
-	}
-
 	config := configs.GetConfig()
-	config.DBConfig.Host = "localhost"
+	if err != nil {
+		fmt.Printf("Env file error: %v", err)
+	} else {
+		config.DBConfig.Host = "localhost"
+	}
 
 	db := dbs.Connect(&config.DBConfig)
 
