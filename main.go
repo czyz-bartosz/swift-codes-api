@@ -38,7 +38,7 @@ func main() {
 	}
 
 	swiftRepo := &repositories.SwiftRepoPostgres{
-		Db: db,
+		Db: &dbs.BunDBWrapper{DB: db},
 	}
 
 	validate := validator.New()

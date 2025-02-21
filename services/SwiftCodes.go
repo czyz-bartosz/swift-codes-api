@@ -37,7 +37,7 @@ func GetSwiftDetails(ctx context.Context, swiftCode string, bankRepo repositorie
 }
 
 func GetSwiftsDetailsByCountryIso2Code(ctx context.Context, countryIso2Code string, bankRepo repositories.SwiftRepo) (
-	countryName *string,
+	countryName string,
 	swifts []models.SwiftMini,
 	err error,
 ) {
