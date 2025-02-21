@@ -16,7 +16,7 @@ import (
 
 type Controller struct {
 	SwiftRepo    repositories.SwiftRepo
-	Validate     *validator.Validate
+	Validate     models.SwiftValidator
 	SwiftService services.SwiftService
 }
 
