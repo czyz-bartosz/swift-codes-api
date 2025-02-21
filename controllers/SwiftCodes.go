@@ -15,8 +15,9 @@ import (
 )
 
 type Controller struct {
-	SwiftRepo repositories.SwiftRepo
-	Validate  *validator.Validate
+	SwiftRepo    repositories.SwiftRepo
+	Validate     models.SwiftValidator
+	SwiftService services.SwiftService
 }
 
 func handleError(c *gin.Context, err error) {
@@ -38,7 +39,7 @@ func handleError(c *gin.Context, err error) {
 func (controller Controller) GetSwiftDetails(c *gin.Context) {
 	ctx := c.Request.Context()
 	swiftCode := c.Param("swiftCode")
-	swift, branches, err := services.GetSwiftDetails(ctx, swiftCode, controller.SwiftRepo)
+	swift, branches, err := controller.SwiftService.GetSwiftDetails(ctx, swiftCode, controller.SwiftRepo)
 	if err != nil {
 		handleError(c, err)
 		return
@@ -70,7 +71,7 @@ func (controller Controller) GetSwiftsDetailsByCountryIso2Code(c *gin.Context) {
 	ctx := c.Request.Context()
 	countryIso2Code := c.Param("countryIso2Code")
 
-	countryName, swifts, err := services.GetSwiftsDetailsByCountryIso2Code(ctx, countryIso2Code, controller.SwiftRepo)
+	countryName, swifts, err := controller.SwiftService.GetSwiftsDetailsByCountryIso2Code(ctx, countryIso2Code, controller.SwiftRepo)
 	if err != nil {
 		handleError(c, err)
 		return
@@ -99,7 +100,7 @@ func (controller Controller) AddSwift(c *gin.Context) {
 		return
 	}
 
-	err = services.AddSwift(ctx, &swift, controller.SwiftRepo, controller.Validate)
+	err = controller.SwiftService.AddSwift(ctx, &swift, controller.SwiftRepo, controller.Validate)
 	if err != nil {
 		handleError(c, err)
 		fmt.Print(err)
@@ -114,7 +115,7 @@ func (controller Controller) AddSwift(c *gin.Context) {
 func (controller Controller) DeleteSwift(c *gin.Context) {
 	ctx := c.Request.Context()
 	swiftCode := c.Param("swiftCode")
-	err := services.DeleteSwift(ctx, swiftCode, controller.SwiftRepo)
+	err := controller.SwiftService.DeleteSwift(ctx, swiftCode, controller.SwiftRepo)
 	if err != nil {
 		handleError(c, err)
 		return

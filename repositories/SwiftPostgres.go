@@ -1,15 +1,15 @@
 package repositories
 
 import (
+	"awesomeProject/dbs"
 	"awesomeProject/models"
 	"context"
 	"database/sql"
 	"fmt"
-	"github.com/uptrace/bun"
 )
 
 type SwiftRepoPostgres struct {
-	Db *bun.DB
+	Db dbs.SwiftDb
 }
 
 func (swiftRepo SwiftRepoPostgres) GetBySwiftCode(ctx context.Context, swiftCode string) (*models.Swift, error) {
@@ -50,7 +50,7 @@ func (swiftRepo SwiftRepoPostgres) GetByCountryIso2Code(ctx context.Context, cou
 	return branches, err
 }
 
-func (swiftRepo SwiftRepoPostgres) GetCountryNameByIso2Code(ctx context.Context, countryIso2Code string) (*string, error) {
+func (swiftRepo SwiftRepoPostgres) GetCountryNameByIso2Code(ctx context.Context, countryIso2Code string) (string, error) {
 	countryName := ""
 
 	query := `
@@ -63,7 +63,7 @@ func (swiftRepo SwiftRepoPostgres) GetCountryNameByIso2Code(ctx context.Context,
 	err := swiftRepo.Db.NewRaw(query, countryIso2Code).Scan(ctx, &countryName)
 	fmt.Println(countryIso2Code, countryName)
 
-	return &countryName, err
+	return countryName, err
 }
 
 func (swiftRepo SwiftRepoPostgres) AddSwift(ctx context.Context, swift *models.Swift) error {

@@ -2,12 +2,14 @@ package main
 
 import (
 	"awesomeProject/configs"
+	"awesomeProject/controllers"
 	"awesomeProject/dbs"
 	"awesomeProject/dbs/migrations"
 	"awesomeProject/internal/dbimporter/utils"
 	"awesomeProject/models"
 	"awesomeProject/repositories"
 	"awesomeProject/routes"
+	"awesomeProject/services"
 	"fmt"
 	"github.com/go-playground/validator/v10"
 	"github.com/uptrace/bun"
@@ -38,13 +40,21 @@ func main() {
 	}
 
 	swiftRepo := &repositories.SwiftRepoPostgres{
-		Db: db,
+		Db: &dbs.BunDBWrapper{DB: db},
 	}
 
 	validate := validator.New()
 	validate.RegisterStructValidation(models.SwiftStructLevelValidation, models.Swift{})
 
-	router := routes.SetupRouter(swiftRepo, validate)
+	swiftService := services.SwiftServiceDefault{}
+
+	swiftController := controllers.Controller{
+		SwiftService: &swiftService,
+		SwiftRepo:    swiftRepo,
+		Validate:     validate,
+	}
+
+	router := routes.SetupRouter(&swiftController)
 	err = router.Run(":8080")
 
 	if err != nil {

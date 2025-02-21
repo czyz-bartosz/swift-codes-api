@@ -7,16 +7,32 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"github.com/go-playground/validator/v10"
 	"strings"
 )
 
-func GetSwiftDetails(ctx context.Context, swiftCode string, bankRepo repositories.SwiftRepo) (
+type SwiftService interface {
+	GetSwiftDetails(ctx context.Context, swiftCode string, swiftRepo repositories.SwiftRepo) (
+		swift *models.Swift,
+		branches []models.SwiftMini,
+		err error,
+	)
+	GetSwiftsDetailsByCountryIso2Code(ctx context.Context, countryIso2Code string, swiftRepo repositories.SwiftRepo) (
+		countryName string,
+		swifts []models.SwiftMini,
+		err error,
+	)
+	AddSwift(ctx context.Context, swift *models.Swift, swiftRepo repositories.SwiftRepo, validate models.SwiftValidator) error
+	DeleteSwift(ctx context.Context, swiftCode string, swiftRepo repositories.SwiftRepo) error
+}
+
+type SwiftServiceDefault struct{}
+
+func (s *SwiftServiceDefault) GetSwiftDetails(ctx context.Context, swiftCode string, swiftRepo repositories.SwiftRepo) (
 	swift *models.Swift,
 	branches []models.SwiftMini,
 	err error,
 ) {
-	swift, err = bankRepo.GetBySwiftCode(ctx, swiftCode)
+	swift, err = swiftRepo.GetBySwiftCode(ctx, swiftCode)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			err = customErrors.ErrSwiftNotFound
@@ -28,7 +44,7 @@ func GetSwiftDetails(ctx context.Context, swiftCode string, bankRepo repositorie
 		return swift, nil, nil
 	}
 
-	branches, err = bankRepo.GetBranchesBySwiftCode(ctx, swiftCode)
+	branches, err = swiftRepo.GetBranchesBySwiftCode(ctx, swiftCode)
 	if err != nil {
 		return
 	}
@@ -36,12 +52,12 @@ func GetSwiftDetails(ctx context.Context, swiftCode string, bankRepo repositorie
 	return swift, branches, nil
 }
 
-func GetSwiftsDetailsByCountryIso2Code(ctx context.Context, countryIso2Code string, bankRepo repositories.SwiftRepo) (
-	countryName *string,
+func (s *SwiftServiceDefault) GetSwiftsDetailsByCountryIso2Code(ctx context.Context, countryIso2Code string, swiftRepo repositories.SwiftRepo) (
+	countryName string,
 	swifts []models.SwiftMini,
 	err error,
 ) {
-	swifts, err = bankRepo.GetByCountryIso2Code(ctx, countryIso2Code)
+	swifts, err = swiftRepo.GetByCountryIso2Code(ctx, countryIso2Code)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			err = customErrors.ErrSwiftNotFound
@@ -49,7 +65,7 @@ func GetSwiftsDetailsByCountryIso2Code(ctx context.Context, countryIso2Code stri
 		return
 	}
 
-	countryName, err = bankRepo.GetCountryNameByIso2Code(ctx, countryIso2Code)
+	countryName, err = swiftRepo.GetCountryNameByIso2Code(ctx, countryIso2Code)
 	if err != nil {
 		return
 	}
@@ -57,13 +73,13 @@ func GetSwiftsDetailsByCountryIso2Code(ctx context.Context, countryIso2Code stri
 	return
 }
 
-func AddSwift(ctx context.Context, swift *models.Swift, bankRepo repositories.SwiftRepo, validate *validator.Validate) error {
+func (s *SwiftServiceDefault) AddSwift(ctx context.Context, swift *models.Swift, swiftRepo repositories.SwiftRepo, validate models.SwiftValidator) error {
 	err := validate.Struct(swift)
 	if err != nil {
 		return err
 	}
 	swift.SwiftCode = strings.ToUpper(swift.SwiftCode)
-	_, err = bankRepo.GetBySwiftCode(ctx, swift.SwiftCode)
+	_, err = swiftRepo.GetBySwiftCode(ctx, swift.SwiftCode)
 
 	if err == nil {
 		return customErrors.ErrSwiftCodeAlreadyExists
@@ -73,7 +89,7 @@ func AddSwift(ctx context.Context, swift *models.Swift, bankRepo repositories.Sw
 		return err
 	}
 
-	err = bankRepo.AddSwift(ctx, swift)
+	err = swiftRepo.AddSwift(ctx, swift)
 	if err != nil {
 		return err
 	}
@@ -81,9 +97,9 @@ func AddSwift(ctx context.Context, swift *models.Swift, bankRepo repositories.Sw
 	return nil
 }
 
-func DeleteSwift(ctx context.Context, swiftCode string, bankRepo repositories.SwiftRepo) error {
+func (s *SwiftServiceDefault) DeleteSwift(ctx context.Context, swiftCode string, swiftRepo repositories.SwiftRepo) error {
 	swiftCode = strings.ToUpper(swiftCode)
-	_, err := bankRepo.GetBySwiftCode(ctx, swiftCode)
+	_, err := swiftRepo.GetBySwiftCode(ctx, swiftCode)
 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -92,7 +108,7 @@ func DeleteSwift(ctx context.Context, swiftCode string, bankRepo repositories.Sw
 		return err
 	}
 
-	err = bankRepo.DeleteSwift(ctx, swiftCode)
+	err = swiftRepo.DeleteSwift(ctx, swiftCode)
 
 	return err
 }
