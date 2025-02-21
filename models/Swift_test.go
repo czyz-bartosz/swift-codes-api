@@ -107,7 +107,7 @@ func TestSwiftStructLevelValidation(t *testing.T) {
 		{
 			name: "Invalid CountryIso2 - not ISO 3166-1 alpha-2",
 			swift: Swift{
-				CountryIso2:   "USA", // Niepoprawny format
+				CountryIso2:   "USA",
 				SwiftCode:     "ABCDEF12XXX",
 				BankName:      "Bank of Test",
 				Address:       "123 Main St",
@@ -120,7 +120,7 @@ func TestSwiftStructLevelValidation(t *testing.T) {
 			name: "Invalid SwiftCode - not 11 characters",
 			swift: Swift{
 				CountryIso2:   "US",
-				SwiftCode:     "ABCDEF12", // Za krótki
+				SwiftCode:     "ABCDEF12",
 				BankName:      "Bank of Test",
 				Address:       "123 Main St",
 				CountryName:   "United States",
@@ -132,7 +132,7 @@ func TestSwiftStructLevelValidation(t *testing.T) {
 			name: "Invalid SwiftCode - contains special characters",
 			swift: Swift{
 				CountryIso2:   "US",
-				SwiftCode:     "ABCDEF12@#$", // Znaki specjalne
+				SwiftCode:     "ABCDEF12@#$",
 				BankName:      "Bank of Test",
 				Address:       "123 Main St",
 				CountryName:   "United States",
@@ -144,7 +144,7 @@ func TestSwiftStructLevelValidation(t *testing.T) {
 			name: "Invalid SwiftCode - contains lowercase letters",
 			swift: Swift{
 				CountryIso2:   "US",
-				SwiftCode:     "abcdef12xxx", // Małe litery
+				SwiftCode:     "abcdef12xxx",
 				BankName:      "Bank of Test",
 				Address:       "123 Main St",
 				CountryName:   "United States",
@@ -155,11 +155,11 @@ func TestSwiftStructLevelValidation(t *testing.T) {
 		{
 			name: "Missing required fields",
 			swift: Swift{
-				CountryIso2:   "", // Brak wymaganego pola
-				SwiftCode:     "", // Brak wymaganego pola
-				BankName:      "", // Brak wymaganego pola
-				Address:       "", // Brak wymaganego pola
-				CountryName:   "", // Brak wymaganego pola
+				CountryIso2:   "",
+				SwiftCode:     "",
+				BankName:      "",
+				Address:       "",
+				CountryName:   "",
 				IsHeadquarter: true,
 			},
 			expectError: true,
