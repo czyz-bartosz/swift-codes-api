@@ -7,7 +7,7 @@
 //
 
 // Package mock_dbs is a generated GoMock package.
-package mock_dbs
+package mocks
 
 import (
 	dbs "awesomeProject/dbs"

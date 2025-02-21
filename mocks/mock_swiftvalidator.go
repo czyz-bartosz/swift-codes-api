@@ -7,7 +7,7 @@
 //
 
 // Package mock_services is a generated GoMock package.
-package mock_services
+package mocks
 
 import (
 	reflect "reflect"

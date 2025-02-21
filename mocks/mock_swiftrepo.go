@@ -7,7 +7,7 @@
 //
 
 // Package mock_repositories is a generated GoMock package.
-package mock_repositories
+package mocks
 
 import (
 	models "awesomeProject/models"
