@@ -34,7 +34,7 @@ func main() {
 		panic(err)
 	}
 
-	err = utils.ImportData("./data.csv")
+	err = utils.ImportData("./data.csv", db)
 	if err != nil {
 		fmt.Println(err)
 	}
