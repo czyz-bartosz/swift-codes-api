@@ -11,11 +11,5 @@ func SetupRouter(swiftController *controllers.Controller) *gin.Engine {
 
 	v1.SetupGroup(router.Group("/v1/swift-codes"), swiftController)
 
-	err := router.Run(":8080")
-
-	if err != nil {
-		panic(err)
-	}
-
 	return router
 }
