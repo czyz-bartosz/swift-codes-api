@@ -1,8 +1,6 @@
 package utils
 
 import (
-	"awesomeProject/configs"
-	"awesomeProject/dbs"
 	"awesomeProject/models"
 	"context"
 	"encoding/csv"
@@ -70,19 +68,7 @@ func parseCSVFile(csvFilePath string) ([]models.Swift, error) {
 	return swifts, nil
 }
 
-func ImportData(csvFilePath string) error {
-	config := configs.GetConfig()
-	db := dbs.Connect(
-		&config.DBConfig,
-	)
-
-	defer func(db *bun.DB) {
-		err := db.Close()
-		if err != nil {
-			fmt.Println("Error closing db")
-		}
-	}(db)
-
+func ImportData(csvFilePath string, db *bun.DB) error {
 	ctx := context.Background()
 
 	banks, err := parseCSVFile(csvFilePath)

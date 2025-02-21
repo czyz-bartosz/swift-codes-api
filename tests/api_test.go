@@ -5,6 +5,7 @@ import (
 	"awesomeProject/controllers"
 	"awesomeProject/dbs"
 	"awesomeProject/dbs/migrations"
+	"awesomeProject/internal/dbimporter/utils"
 	"awesomeProject/models"
 	"awesomeProject/repositories"
 	"awesomeProject/routes"
@@ -62,9 +63,28 @@ func setupTestEnvironment(t *testing.T) (*bun.DB, *controllers.Controller) {
 	return db, &swiftController
 }
 
+func afterTest(db *bun.DB) {
+	_, err := db.NewDropTable().IfExists().Model((*models.Swift)(nil)).Exec(context.Background())
+	if err != nil {
+		fmt.Printf("Failed to drop table: %v", err)
+	}
+
+	err = migrations.Migrate(db)
+	if err != nil {
+		fmt.Printf("Failed to migrate database: %v", err)
+	}
+
+	err = utils.ImportData("../data.csv", db)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	db.Close()
+}
+
 func TestAddSwift(t *testing.T) {
 	db, swiftController := setupTestEnvironment(t)
-	defer db.Close()
+	defer afterTest(db)
 
 	router := routes.SetupRouter(swiftController)
 
@@ -98,7 +118,7 @@ func TestAddSwift(t *testing.T) {
 
 func TestGetSwiftDetails(t *testing.T) {
 	db, swiftController := setupTestEnvironment(t)
-	defer db.Close()
+	defer afterTest(db)
 
 	router := routes.SetupRouter(swiftController)
 
@@ -143,7 +163,7 @@ func TestGetSwiftDetails(t *testing.T) {
 
 func TestDeleteSwift(t *testing.T) {
 	db, swiftController := setupTestEnvironment(t)
-	defer db.Close()
+	defer afterTest(db)
 
 	router := routes.SetupRouter(swiftController)
 
@@ -187,7 +207,7 @@ func TestDeleteSwift(t *testing.T) {
 
 func TestGetSwiftsDetailsByCountryIso2Code(t *testing.T) {
 	db, swiftController := setupTestEnvironment(t)
-	defer db.Close()
+	defer afterTest(db)
 
 	router := routes.SetupRouter(swiftController)
 
